@@ -1,0 +1,204 @@
+/* Paul Trading Dashboard - Terminal CSS v2.0 */
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
+
+/* Global Monospace & Dark Base */
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #0E1117;
+    font-family: 'Source Code Pro', 'Courier New', monospace !important;
+    color: #E0E0E0;
+}
+
+/* Hide Streamlit Header/Footer elements but keep the sidebar control */
+footer {visibility: hidden;}
+[data-testid="stHeader"] {background: transparent; box-shadow: none;}
+.stAppDeployButton, [data-testid="stStatusWidget"], #MainMenu {display: none;}
+[data-testid="collapsedControl"] {visibility: visible !important;}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #1A1C23;
+    border-right: 1px solid #333;
+}
+
+/* Typography */
+h1, h2, h3 { color: #FFB100 !important; }
+.stMetric label { color: #888 !important; }
+.stMetric div[data-testid="stMetricValue"] { color: #00D1FF !important; }
+
+/* Zero border-radius for Terminal hardness */
+div.stElement, .stSelectbox>div>div {
+    border-radius: 0px !important;
+}
+
+/* ===== ALL STREAMLIT BUTTONS — Terminal Dark Style ===== */
+.stButton > button {
+    background-color: #1A1C23 !important;
+    border: 1px solid #00D1FF !important;
+    color: #00D1FF !important;
+    border-radius: 0px !important;
+    font-family: 'Source Code Pro', 'Courier New', monospace !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    padding: 4px 8px !important;
+    transition: all 0.15s ease-in-out !important;
+    box-shadow: none !important;
+    width: 100% !important;
+}
+
+.stButton > button:hover {
+    background-color: #FFB100 !important;
+    border-color: #FFB100 !important;
+    color: #0E1117 !important;
+    box-shadow: 0 0 8px rgba(255, 177, 0, 0.4) !important;
+}
+
+.stButton > button:active,
+.stButton > button:focus {
+    background-color: #FFB100 !important;
+    border-color: #FFB100 !important;
+    color: #0E1117 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Radio buttons \u2014 compact inline style for Movers toggle */
+.stRadio > div {
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+.stRadio > div > label {
+    background-color: #1A1C23 !important;
+    border: 1px solid #333 !important;
+    color: #888 !important;
+    padding: 4px 8px !important;
+    font-family: 'Source Code Pro', monospace !important;
+    font-size: 11px !important;
+    border-radius: 0px !important;
+    cursor: pointer;
+}
+.stRadio > div > label:has(input:checked) {
+    border-color: #00D1FF !important;
+    color: #00D1FF !important;
+}
+
+
+/* Bullish/Bearish */
+.bullish { color: #00D1FF; }
+.bearish { color: #FF4B4B; }
+.warning { color: #FFB100; }
+
+/* Sidebar Expand Button */
+[data-testid="collapsedControl"] {
+    background-color: #1A1C23 !important;
+    border: 1px solid #00D1FF !important;
+    color: #00D1FF !important;
+    border-radius: 2px !important;
+    padding: 5px !important;
+    box-shadow: 0 0 8px rgba(0, 209, 255, 0.4) !important;
+    transition: all 0.2s ease-in-out;
+}
+[data-testid="collapsedControl"]:hover {
+    background-color: #00D1FF !important;
+    color: #0E1117 !important;
+    box-shadow: 0 0 15px rgba(0, 209, 255, 0.8) !important;
+}
+[data-testid="collapsedControl"] svg {
+    width: 32px !important;
+    height: 32px !important;
+    fill: currentColor !important;
+}
+
+/* ===== RIBBON MARQUEE ===== */
+@keyframes ribbonScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.ribbon-track {
+    display: flex;
+    animation: ribbonScroll 30s linear infinite;
+    white-space: nowrap;
+}
+.ribbon-container {
+    width: 100%;
+    overflow: hidden;
+    background-color: #12141A;
+    border-bottom: 1px solid #333;
+    padding: 6px 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+}
+.ribbon-item {
+    display: inline-block;
+    padding: 0 25px;
+    color: #E0E0E0;
+}
+.ribbon-item .lbl { color: #FFB100; font-weight: bold; margin-right: 8px; }
+.ribbon-item .pos { color: #00D1FF; }
+.ribbon-item .neg { color: #FF4B4B; }
+
+/* ===== MOVER BOXES ===== */
+.mover-box {
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: center;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12px;
+    background-color: #12141A;
+}
+.mover-box .sym { color: #FFB100; font-weight: bold; }
+.mover-box .price { color: #E0E0E0; font-size: 11px; }
+
+/* ===== TIMEFRAME BUTTONS ===== */
+.tf-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+.tf-btn {
+    flex: 1;
+    background-color: #1A1C23;
+    border: 1px solid #333;
+    color: #888;
+    padding: 6px 8px;
+    text-align: center;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.tf-btn:hover { border-color: #00D1FF; color: #00D1FF; }
+.tf-btn.active { background-color: #00D1FF; color: #0E1117; border-color: #00D1FF; font-weight: bold; }
+
+/* ===== NEWS CHANNEL ROWS ===== */
+.news-channel {
+    border: 1px solid #333;
+    padding: 10px;
+    min-height: 140px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #12141A;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12px;
+}
+.news-channel .ch-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 4px;
+}
+
+/* ===== MAIN CHART PANEL ===== */
+.chart-panel {
+    border: 1px solid #333;
+    padding: 5px;
+}
+
+/* ===== INTEL/SOCIAL SIDEBAR PANEL ===== */
+.intel-panel {
+    border: 1px solid #333;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #12141A;
+}

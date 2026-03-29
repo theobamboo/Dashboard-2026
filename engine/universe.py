@@ -1,0 +1,40 @@
+# Predefined Top 100/20 assets for the Streamlit UI
+
+STOCKS_100 = [
+    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "BRK-B", "LLY", "V", 
+    "JPM", "WMT", "MA", "UNH", "AVGO", "PG", "JNJ", "XOM", "HD", "ORCL", "MRK", 
+    "CVX", "COST", "ABBV", "CRM", "AMD", "BAC", "PEP", "KO", "NFLX", "TMO", "MCD", 
+    "DIS", "ADBE", "CSCO", "ABT", "DHR", "INTC", "WFC", "QCOM", "TXN", "INTU", 
+    "IBM", "CMCSA", "AMGN", "PFE", "BA", "UNP", "SPY", "QQQ", "CAT", "GE", "NOW", 
+    "HON", "SYK", "NKE", "BKNG", "SPGI", "LMT", "AXP", "MDT", "C", "ISRG", "ELV", 
+    "GILD", "VRTX", "TJX", "DE", "REGN", "ADI", "MDLZ", "CVS", "ZTS", "BSX", "CB", 
+    "GS", "CI", "FI", "LRCX", "MMC", "SBUX", "PANW", "PGR", "EQIX", "MU", "SCHW", 
+    "SO", "BDX", "ETN", "SLB", "AON", "EOG", "NXPI", "WM", "DUK", "CSX", "CDNS", 
+    "KLAC", "SNPS"
+]
+
+CRYPTO_100 = [
+    "BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT", "ADA/USDT", 
+    "AVAX/USDT", "DOGE/USDT", "DOT/USDT", "TRX/USDT", "LINK/USDT", "MATIC/USDT", 
+    "SHIB/USDT", "LTC/USDT", "BCH/USDT", "XLM/USDT", "UNI/USDT", "ATOM/USDT", 
+    "INJ/USDT", "APT/USDT", "NEAR/USDT", "ARB/USDT", "OP/USDT", "LDO/USDT", 
+    "TIA/USDT", "RNDR/USDT", "IMX/USDT", "STX/USDT", "FIL/USDT", "VET/USDT", 
+    "MNT/USDT", "KAS/USDT", "ICP/USDT", "CRO/USDT", "MTA/USDT", "FTM/USDT", 
+    "AAVE/USDT", "ALGO/USDT", "GRT/USDT", "MKR/USDT", "QNT/USDT", "RUNE/USDT", 
+    "SNX/USDT", "EGLD/USDT", "THETA/USDT", "SAND/USDT", "MANA/USDT", "AXS/USDT", 
+    "XTZ/USDT", "NEO/USDT", "EOS/USDT", "KAVA/USDT", "IOTA/USDT", "MINA/USDT", 
+    "SUI/USDT", "SEI/USDT", "PENDLE/USDT", "BLUR/USDT", "GALA/USDT", "CHZ/USDT", 
+    "PEPE/USDT", "WLD/USDT", "FXS/USDT", "ENS/USDT", "APE/USDT", "CRV/USDT", 
+    "BAT/USDT", "ENJ/USDT", "ROSE/USDT", "RVN/USDT", "GMX/USDT", "ZIL/USDT", 
+    "DASH/USDT", "COMP/USDT", "1INCH/USDT", "YFI/USDT", "ZRX/USDT", "CAKE/USDT", 
+    "HOT/USDT", "ANKR/USDT", "AUDIO/USDT", "CHESS/USDT", "ICX/USDT", "JASMY/USDT", 
+    "LRC/USDT", "MASK/USDT", "OGN/USDT", "OMG/USDT", "ONT/USDT", "ORDI/USDT", 
+    "QTUM/USDT", "SKL/USDT", "SLP/USDT", "STORJ/USDT", "SUSHI/USDT", "WAXP/USDT", 
+    "GLM/USDT", "SFP/USDT", "TWT/USDT", "C98/USDT"
+]
+
+FOREX_20 = [
+    "EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CAD", "USD/CHF", "NZD/USD", 
+    "EUR/GBP", "EUR/JPY", "GBP/JPY", "CHF/JPY", "AUD/JPY", "EUR/AUD", "EUR/CAD", 
+    "AUD/CAD", "CAD/JPY", "NZD/JPY", "GBP/AUD", "GBP/CAD", "USD/ZAR"
+]

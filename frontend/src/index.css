@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ─────────────────────────────────────────────── */
+:root {
+  --bg:          #080c14;
+  --surface:     #0f1624;
+  --surface-2:   #141e30;
+  --border:      #1e2d45;
+  --accent-cyan: #00d4ff;
+  --gain:        #00ff88;
+  --loss:        #ff3366;
+  --text-1:      #e8edf5;
+  --text-2:      #8fa4be;
+  --text-3:      #4a637a;
+}
+
+/* ── Base Reset ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-1);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root { height: 100%; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3f5c; }
+
+/* ── Utility classes ────────────────────────────────────────────────────── */
+@layer components {
+
+  /* Glass card */
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-xl;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  /* Glass card with hover pop */
+  .glass-hover {
+    @apply glass transition-all duration-200;
+  }
+  .glass-hover:hover {
+    @apply border-white/[0.15];
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  /* Numeric values */
+  .num { @apply font-mono tabular-nums; }
+
+  /* Gain / loss badges */
+  .badge-gain {
+    @apply inline-flex items-center gap-1 text-gain text-xs font-mono font-medium
+           bg-gain/10 border border-gain/20 rounded px-1.5 py-0.5;
+  }
+  .badge-loss {
+    @apply inline-flex items-center gap-1 text-loss text-xs font-mono font-medium
+           bg-loss/10 border border-loss/20 rounded px-1.5 py-0.5;
+  }
+  .badge-neutral {
+    @apply inline-flex items-center gap-1 text-neutral text-xs font-mono font-medium
+           bg-neutral/10 border border-neutral/20 rounded px-1.5 py-0.5;
+  }
+
+  /* Section label */
+  .section-label {
+    @apply text-[10px] font-semibold tracking-[0.15em] uppercase text-text-muted;
+  }
+
+  /* Glow dot — live indicator */
+  .live-dot {
+    @apply inline-block w-1.5 h-1.5 rounded-full bg-gain animate-pulse-slow;
+    box-shadow: 0 0 6px rgba(0,255,136,0.8);
+  }
+}
+
+/* ── Dot grid background ────────────────────────────────────────────────── */
+.dot-bg {
+  background-image: radial-gradient(circle, #1e2d45 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Ticker marquee ─────────────────────────────────────────────────────── */
+.ticker-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-inner {
+  display: inline-flex;
+  animation: ticker 50s linear infinite;
+}
+.ticker-inner:hover { animation-play-state: paused; }
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Fear & Greed arc ───────────────────────────────────────────────────── */
+.fg-arc {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* ── Page transitions ───────────────────────────────────────────────────── */
+.page-enter {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

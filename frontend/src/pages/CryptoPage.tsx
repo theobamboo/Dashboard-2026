@@ -1,7 +1,8 @@
 import { useCryptoOverview, useFearGreed, usePrices } from '../api/crypto'
 import StatCard from '../components/StatCard'
 import PageHeader from '../components/PageHeader'
-import { Bitcoin, TrendingUp, TrendingDown, Activity, Zap, Droplets, BarChart3 } from 'lucide-react'
+import BubbleChart from '../components/BubbleChart'
+import { Bitcoin, Zap, Droplets, BarChart3 } from 'lucide-react'
 
 // ── Fear & Greed Arc ──────────────────────────────────────────────────────
 function FearGreedGauge({ value, classification }: { value: number; classification: string }) {
@@ -228,39 +229,27 @@ export default function CryptoPage() {
         />
       </div>
 
-      {/* ── Middle row — F&G gauge + stub panels ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Fear & Greed gauge */}
-        {fgLoading ? (
-          <div className="glass rounded-xl p-5 animate-pulse">
-            <div className="h-3 w-28 bg-surface-2 rounded mb-4" />
-            <div className="h-24 bg-surface-2 rounded" />
-          </div>
-        ) : fg ? (
-          <FearGreedGauge value={fg.current.value} classification={fg.current.classification} />
-        ) : null}
+      {/* ── Bubble Chart — full width ── */}
+      <BubbleChart />
 
-        {/* Layer 6 placeholders */}
-        <StubPanel
-          icon={Activity}
-          title="Bubble Chart"
-          description="D3.js force-directed packed circles — top 100 coins by mcap/change"
-          layer="Layer 6"
-        />
-        <StubPanel
-          icon={Zap}
-          title="Funding Rates"
-          description="Perpetual futures funding rates across major exchanges via CoinGlass"
-          layer="Layer 3"
-        />
-      </div>
-
-      {/* ── Bottom row — table + stubs ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2">
-          <TopCoinsTable />
-        </div>
+      {/* ── Lower row — F&G gauge + table + stubs ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+        {/* Left column: F&G gauge + stub panels */}
         <div className="space-y-4">
+          {fgLoading ? (
+            <div className="glass rounded-xl p-5 animate-pulse">
+              <div className="h-3 w-28 bg-surface-2 rounded mb-4" />
+              <div className="h-24 bg-surface-2 rounded" />
+            </div>
+          ) : fg ? (
+            <FearGreedGauge value={fg.current.value} classification={fg.current.classification} />
+          ) : null}
+          <StubPanel
+            icon={Zap}
+            title="Funding Rates"
+            description="Perpetual futures funding rates across major exchanges via CoinGlass"
+            layer="Layer 3"
+          />
           <StubPanel
             icon={Droplets}
             title="Liquidations Heatmap"
@@ -273,6 +262,11 @@ export default function CryptoPage() {
             description="Aggregated OI across BTC/ETH perps"
             layer="Layer 3"
           />
+        </div>
+
+        {/* Top coins table spans remaining 3 cols */}
+        <div className="xl:col-span-3">
+          <TopCoinsTable />
         </div>
       </div>
     </div>

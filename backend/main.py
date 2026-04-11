@@ -3,13 +3,26 @@ Living the Dream Trading — Backend API
 Entry point: uvicorn backend.main:app --reload --port 8000
 """
 
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import settings
+from backend.engines.crypto_engine import crypto_engine
 from backend.routers import crypto, stocks, bonds, fx
+
+
+# ---------------------------------------------------------------------------
+# Lifespan — startup / shutdown hooks
+# ---------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: nothing to initialise — engines use lazy client creation
+    yield
+    # Shutdown: close async HTTP clients
+    await crypto_engine.close()
 
 # ---------------------------------------------------------------------------
 # App instance
@@ -23,6 +36,7 @@ app = FastAPI(
     version=settings.APP_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # ---------------------------------------------------------------------------

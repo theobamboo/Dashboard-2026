@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -58,15 +58,36 @@ class CoinPrice(BaseModel):
     high_24h: Optional[float] = None
     low_24h: Optional[float] = None
     price_change_24h: Optional[float] = None
+    # These are populated when price_change_percentage=1h,24h,7d is requested.
+    # The _in_currency aliases are the accurate per-currency values; the plain
+    # fields (e.g. price_change_percentage_24h) are always returned by CoinGecko
+    # and serve as the fallback.
     price_change_percentage_1h: Optional[float] = Field(None, alias="price_change_percentage_1h_in_currency")
     price_change_percentage_24h: Optional[float] = Field(None, alias="price_change_percentage_24h_in_currency")
     price_change_percentage_7d: Optional[float] = Field(None, alias="price_change_percentage_7d_in_currency")
+    # Raw plain fields (always present from CoinGecko) — used as fallbacks
+    _raw_pct_24h: Optional[float] = None
     circulating_supply: Optional[float] = None
     ath: Optional[float] = None
     ath_change_percentage: Optional[float] = None
     last_updated: Optional[str] = None
 
     model_config = {"populate_by_name": True}
+
+    @model_validator(mode="before")
+    @classmethod
+    def _fill_pct_fallbacks(cls, data: dict) -> dict:
+        """If the _in_currency variants are absent/null, fall back to the plain
+        price_change_percentage_* fields that CoinGecko always returns."""
+        if isinstance(data, dict):
+            for tf_key, plain_key in (
+                ("price_change_percentage_1h_in_currency",  "price_change_percentage_1h"),
+                ("price_change_percentage_24h_in_currency", "price_change_percentage_24h"),
+                ("price_change_percentage_7d_in_currency",  "price_change_percentage_7d"),
+            ):
+                if data.get(tf_key) is None and data.get(plain_key) is not None:
+                    data[tf_key] = data[plain_key]
+        return data
 
 
 class PricesResponse(BaseModel):

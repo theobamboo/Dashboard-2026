@@ -34,7 +34,7 @@ export default function FXPage() {
           <StatCard
             key={pair}
             label={pair}
-            value={data?.rates?.[pair] ? `${data.rates[pair].price >= 10 ? data.rates[pair].price.toFixed(2) : data.rates[pair].price.toFixed(4)}` : '—'}
+            value={data?.rates?.[pair]?.price != null ? `${data.rates[pair].price >= 10 ? data.rates[pair].price.toFixed(2) : data.rates[pair].price.toFixed(4)}` : '—'}
             change={data?.rates?.[pair]?.change_pct}
             loading={isLoading}
             icon={<Globe size={14} />}
@@ -43,7 +43,7 @@ export default function FXPage() {
 
         <StatCard
           label="DXY Dollar Index"
-          value={data?.dxy?.price !== undefined ? `${data.dxy.price.toFixed(2)}` : '—'}
+          value={data?.dxy?.price != null ? `${data.dxy.price.toFixed(2)}` : '—'}
           change={data?.dxy?.change_pct}
           loading={isLoading}
           icon={<DollarSign size={14} />}

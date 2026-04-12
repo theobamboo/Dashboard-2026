@@ -35,21 +35,20 @@ const TF_LABELS: { key: Timeframe; label: string }[] = [
 function getPct(coin: CoinPrice, tf: Timeframe): number {
   switch (tf) {
     case '1h':  return coin.price_change_percentage_1h  ?? 0
-    case '24h': return coin.price_change_percentage_24h ?? 0
+    case '24h': return coin.price_change_percentage_24h ?? coin.price_change_24h ?? 0
     case '7d':  return coin.price_change_percentage_7d  ?? 0
   }
 }
 
+const colorScaleGain = d3.scaleLinear<string>().domain([0, 15]).range(['#1a4a2a', '#00ff88']).clamp(true)
+const colorScaleLoss = d3.scaleLinear<string>().domain([-15, 0]).range(['#ff3366', '#4a1a26']).clamp(true)
+
 /** Returns a hex colour for a given % change (-∞…+∞). */
 function pctToColor(pct: number): string {
-  const clamped = Math.max(-20, Math.min(20, pct))
-  if (Math.abs(clamped) < 0.05) return '#1a2535'
-  if (clamped > 0) {
-    const t = Math.min(clamped / 12, 1)
-    return d3.interpolateRgb('#0d2a1a', '#00cc66')(t as number)
-  }
-  const t = Math.min(Math.abs(clamped) / 12, 1)
-  return d3.interpolateRgb('#2a0d16', '#e02052')(t as number)
+  if (Math.abs(pct) < 0.05) return '#1a2535'
+  // Use a minimum threshold so even tiny changes show a visible hue
+  if (pct > 0) return colorScaleGain(Math.max(pct, 0.3))
+  return colorScaleLoss(Math.min(pct, -0.3))
 }
 
 /** Returns the border stroke colour (brighter than fill). */

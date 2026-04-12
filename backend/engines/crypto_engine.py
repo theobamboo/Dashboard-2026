@@ -110,7 +110,9 @@ class CryptoEngine:
             },
         )
 
-        coins = [CoinPrice.model_validate(item) for item in raw]
+        stablecoins = {"USDT", "USDC", "BUSD", "DAI", "TUSD", "USDP", "USDD", "GUSD", "FRAX", "LUSD"}
+        filtered_raw = [item for item in raw if item.get("symbol", "").upper() not in stablecoins]
+        coins = [CoinPrice.model_validate(item) for item in filtered_raw]
         result = PricesResponse(
             coins=coins,
             count=len(coins),

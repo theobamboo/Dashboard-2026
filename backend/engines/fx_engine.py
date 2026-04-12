@@ -114,16 +114,29 @@ class FXEngine:
             for pair, yf_sym in pair_to_yf.items():
                 ticker = tickers.tickers.get(yf_sym)
                 if ticker:
-                    fast_info = getattr(ticker, 'fast_info', {})
-                    info = getattr(ticker, 'info', {})
-                    
-                    price = fast_info.get("last_price", info.get("regularMarketPrice", 0))
-                    prev_close = fast_info.get("previous_close", info.get("previousClose", 0))
-                    change_pct = ((price - prev_close) / prev_close * 100) if prev_close and prev_close > 0 else 0
-                    
+                    # fast_info is a FastInfo object (attributes, not dict keys)
+                    fast_info = getattr(ticker, 'fast_info', None)
+                    info = getattr(ticker, 'info', {}) or {}
+
+                    price = (
+                        getattr(fast_info, 'last_price', None)
+                        or info.get('regularMarketPrice')
+                        or 0.0
+                    )
+                    prev_close = (
+                        getattr(fast_info, 'previous_close', None)
+                        or info.get('previousClose')
+                        or 0.0
+                    )
+                    change_pct = (
+                        (price - prev_close) / prev_close * 100
+                        if prev_close and prev_close > 0
+                        else 0.0
+                    )
+
                     res[pair] = {
-                        "price": price,
-                        "change_pct": change_pct
+                        "price": float(price),
+                        "change_pct": float(change_pct)
                     }
         except Exception as e:
             logger.error(f"yfinance fx fallback error: {e}")
@@ -132,16 +145,29 @@ class FXEngine:
     def _fetch_dxy(self) -> Dict[str, Any]:
         try:
             ticker = yf.Ticker("DX-Y.NYB")
-            fast_info = getattr(ticker, 'fast_info', {})
-            info = getattr(ticker, 'info', {})
-            
-            price = fast_info.get("last_price", info.get("regularMarketPrice", 0))
-            prev_close = fast_info.get("previous_close", info.get("previousClose", 0))
-            change_pct = ((price - prev_close) / prev_close * 100) if prev_close and prev_close > 0 else 0
-            
+            # fast_info is a FastInfo object (attributes, not dict keys)
+            fast_info = getattr(ticker, 'fast_info', None)
+            info = getattr(ticker, 'info', {}) or {}
+
+            price = (
+                getattr(fast_info, 'last_price', None)
+                or info.get('regularMarketPrice')
+                or 0.0
+            )
+            prev_close = (
+                getattr(fast_info, 'previous_close', None)
+                or info.get('previousClose')
+                or 0.0
+            )
+            change_pct = (
+                (price - prev_close) / prev_close * 100
+                if prev_close and prev_close > 0
+                else 0.0
+            )
+
             return {
-                "price": price,
-                "change_pct": change_pct
+                "price": float(price),
+                "change_pct": float(change_pct)
             }
         except Exception as e:
             logger.error(f"yfinance DXY error: {e}")

@@ -50,7 +50,7 @@ class Settings:
     FRED_BASE_URL: str = "https://api.stlouisfed.org/fred/series/observations"
 
     EXCHANGERATE_BASE_URL: str = "https://api.exchangerate.host"
-
+    EXCHANGERATE_API_KEY: str = os.getenv("EXCHANGERATE_API_KEY", "")
     # -----------------------------------------------------------------------
     # Telegram alerts
     # -----------------------------------------------------------------------

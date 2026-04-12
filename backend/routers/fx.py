@@ -1,40 +1,27 @@
-"""
-FX router — stub (Layer 1).
-Full implementation in Layer 2: exchangerate.host, CFTC COT data.
-"""
-
-from fastapi import APIRouter
-
-from backend.models import MarketStub
+from fastapi import APIRouter, HTTPException
+from backend.engines.fx_engine import stances
+from pydantic import BaseModel
+from typing import Dict, Any, Optional
 
 router = APIRouter()
 
+class FxRate(BaseModel):
+    price: float
+    change_pct: float
 
-@router.get("/", response_model=MarketStub)
-async def fx_root() -> MarketStub:
-    """FX market overview — not yet implemented."""
-    return MarketStub(market="fx")
+class DxyStatus(BaseModel):
+    price: float
+    change_pct: float
 
+class FxOverviewResponse(BaseModel):
+    rates: Dict[str, FxRate]
+    dxy: Optional[DxyStatus] = None
+    cached: bool
 
-@router.get("/rates", response_model=MarketStub)
-async def fx_rates() -> MarketStub:
-    """Major FX pair rates via exchangerate.host."""
-    return MarketStub(market="fx", message="FX rates — Layer 2.")
-
-
-@router.get("/cot", response_model=MarketStub)
-async def fx_cot() -> MarketStub:
-    """CFTC Commitment of Traders (COT) positioning data."""
-    return MarketStub(market="fx", message="COT data — Layer 2.")
-
-
-@router.get("/correlations", response_model=MarketStub)
-async def fx_correlations() -> MarketStub:
-    """Cross-pair correlation matrix."""
-    return MarketStub(market="fx", message="Correlations — Layer 2.")
-
-
-@router.get("/carry", response_model=MarketStub)
-async def fx_carry() -> MarketStub:
-    """Carry trade ranking by interest rate differential."""
-    return MarketStub(market="fx", message="Carry trade — Layer 2.")
+@router.get("/overview", response_model=FxOverviewResponse)
+async def get_fx_overview():
+    try:
+        data = await stances.get_overview()
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -27,7 +27,7 @@ class FXEngine:
         """
         Fetch major FX pairs and DXY correlation/rates.
         """
-        cached = await self.cache.get("fx_overview")
+        cached = self.cache.get("fx_overview")
         if cached:
             cached["cached"] = True
             return cached
@@ -45,7 +45,7 @@ class FXEngine:
             "dxy": dxy_data,
             "cached": False
         }
-        await self.cache.set("fx_overview", result)
+        self.cache.set("fx_overview", result)
         return result
 
     async def _fetch_live_rates(self) -> Dict[str, Any]:

@@ -20,7 +20,7 @@ class StocksEngine:
         Fetch SPY, QQQ, VIX, and mock Put/Call ratio.
         """
         # Check cache first
-        cached = await self.cache.get("stocks_overview")
+        cached = self.cache.get("stocks_overview")
         if cached:
             cached["cached"] = True
             return cached
@@ -42,7 +42,7 @@ class StocksEngine:
             "assets": data,
             "cached": False
         }
-        await self.cache.set("stocks_overview", result)
+        self.cache.set("stocks_overview", result)
         return result
 
     def _fetch_yf_data(self) -> Dict[str, Any]:

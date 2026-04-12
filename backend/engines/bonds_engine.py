@@ -28,7 +28,7 @@ class BondsEngine:
         """
         Fetch DGS2, DGS10, DGS30, FEDFUNDS, CPI, Unemployment, and DXY.
         """
-        cached = await self.cache.get("bonds_overview")
+        cached = self.cache.get("bonds_overview")
         if cached:
             cached["cached"] = True
             return cached
@@ -55,7 +55,7 @@ class BondsEngine:
             "dxy": dxy_data,
             "cached": False
         }
-        await self.cache.set("bonds_overview", result)
+        self.cache.set("bonds_overview", result)
         return result
 
     async def _fetch_fred_data(self) -> Dict[str, Any]:

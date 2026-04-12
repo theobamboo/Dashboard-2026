@@ -13,7 +13,7 @@ class FXEngine:
     Engine for fetching FX data via exchangerate.host and yfinance.
     """
     def __init__(self):
-        self.cache = TTLCache(ttl_seconds=60)
+        self.cache = TTLCache(default_ttl=60)
         self.pairs = ["EUR/USD", "GBP/USD", "USD/JPY", "GBP/EUR", "USD/CHF", "AUD/USD"]
         self._client = None
 

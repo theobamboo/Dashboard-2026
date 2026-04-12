@@ -12,7 +12,7 @@ class StocksEngine:
     """
     def __init__(self):
         # 1-minute TTL for stock quotes
-        self.cache = TTLCache(ttl_seconds=60)
+        self.cache = TTLCache(default_ttl=60)
         self.symbols = ['SPY', 'QQQ', '^VIX']
 
     async def get_overview(self) -> Dict[str, Any]:

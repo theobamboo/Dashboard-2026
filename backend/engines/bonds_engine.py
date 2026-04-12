@@ -14,7 +14,7 @@ class BondsEngine:
     """
     def __init__(self):
         # 5-minute TTL for macro data (FRED updates infrequently)
-        self.cache = TTLCache(ttl_seconds=300)
+        self.cache = TTLCache(default_ttl=300)
         self.fred_series = ['DGS2', 'DGS10', 'DGS30', 'FEDFUNDS', 'CPIAUCSL', 'UNRATE']
         self._client = None
 

@@ -1,5 +1,6 @@
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
+import TradingViewChart from '../components/TradingViewChart'
 import { TrendingUp, BarChart2, Eye, Activity, DollarSign, Percent } from 'lucide-react'
 import { useStocksOverview } from '../api/stocks'
 
@@ -50,7 +51,6 @@ export default function StocksPage() {
           change={data?.assets['^VIX']?.change_pct}
           loading={isLoading}
           icon={<Percent size={14} />}
-          // Inverse colors for VIX: rise is bad, drop is good (optional, but keep default for now)
         />
         <StatCard
           label="Put/Call Ratio (CBOE)"
@@ -61,8 +61,15 @@ export default function StocksPage() {
         />
       </div>
 
+      {/* ── TradingView Chart ── */}
+      <TradingViewChart
+        symbol="AMEX:SPY"
+        label="SPY — S&P 500 ETF Advanced Chart"
+        height={420}
+      />
+
+      {/* ── Coming soon panels ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ComingSoon icon={BarChart2}  title="TradingView Chart"    desc="Embedded chart with swing trade overlays" layer="Layer 4" />
         <ComingSoon icon={Activity}   title="VIX Term Structure"   desc="CBOE VIX spot + futures curve" layer="Layer 4" />
         <ComingSoon icon={Eye}        title="Put/Call Ratio"       desc="CBOE equity put/call ratio history" layer="Layer 4" />
         <ComingSoon icon={TrendingUp} title="Momentum Screener"    desc="Volume breakout + momentum scanner" layer="Layer 4" />

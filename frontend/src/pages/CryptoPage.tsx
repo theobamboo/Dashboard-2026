@@ -2,6 +2,7 @@ import { useCryptoOverview, useFearGreed, usePrices } from '../api/crypto'
 import StatCard from '../components/StatCard'
 import PageHeader from '../components/PageHeader'
 import BubbleChart from '../components/BubbleChart'
+import TradingViewChart from '../components/TradingViewChart'
 import { Bitcoin, Zap, Droplets, BarChart3 } from 'lucide-react'
 
 // ── Fear & Greed Arc ──────────────────────────────────────────────────────
@@ -231,6 +232,13 @@ export default function CryptoPage() {
 
       {/* ── Bubble Chart — full width ── */}
       <BubbleChart />
+
+      {/* ── TradingView Chart ── */}
+      <TradingViewChart
+        symbol="BINANCE:BTCUSDT"
+        label="BTC / USDT — Advanced Chart"
+        height={420}
+      />
 
       {/* ── Lower row — F&G gauge + table + stubs ── */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">

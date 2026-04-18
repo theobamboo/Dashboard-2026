@@ -1,5 +1,6 @@
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
+import TradingViewChart from '../components/TradingViewChart'
 import { TrendingUp, Globe, BarChart3, DollarSign, Activity, Compass } from 'lucide-react'
 import { useFxOverview } from '../api/fx'
 
@@ -58,6 +59,14 @@ export default function FXPage() {
         />
       </div>
 
+      {/* ── TradingView Chart ── */}
+      <TradingViewChart
+        symbol="FX:EURUSD"
+        label="EUR / USD — Advanced Chart"
+        height={420}
+      />
+
+      {/* ── Coming soon panels ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ComingSoon icon={TrendingUp} title="DXY Correlation Matrix" desc="Live correlation heatmaps for major pairs" layer="Layer 6" />
         <ComingSoon icon={BarChart3}  title="CFTC COT Positioning"   desc="Commitment of Traders weekly bias" layer="Layer 6" />

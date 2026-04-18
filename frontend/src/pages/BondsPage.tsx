@@ -1,5 +1,6 @@
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
+import TradingViewChart from '../components/TradingViewChart'
 import { TrendingUp, Globe, BarChart3, DollarSign, Percent, Briefcase } from 'lucide-react'
 import { useBondsOverview } from '../api/bonds'
 
@@ -26,7 +27,7 @@ export default function BondsPage() {
     <div className="space-y-6 max-w-[1600px] animate-fade-in">
       <PageHeader
         title="Bonds &amp; Macro"
-        subtitle="FRED · yfinance · USD & Yields"
+        subtitle="FRED · yfinance · USD &amp; Yields"
         badge={data?.cached ? "CACHED" : "LIVE"}
         badgeColor="#00d4ff"
       />
@@ -82,7 +83,7 @@ export default function BondsPage() {
           loading={isLoading}
           icon={<Briefcase size={14} />}
         />
-         <StatCard
+        <StatCard
           label="US 30Y Yield"
           value={safeVal('DGS30') !== undefined ? `${safeVal('DGS30')!.toFixed(2)}%` : '—'}
           change={safeChange('DGS30')}
@@ -91,10 +92,18 @@ export default function BondsPage() {
         />
       </div>
 
+      {/* ── TradingView Chart ── */}
+      <TradingViewChart
+        symbol="TVC:US10Y"
+        label="US 10-Year Treasury Yield — Advanced Chart"
+        height={420}
+      />
+
+      {/* ── Coming soon panels ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ComingSoon icon={TrendingUp} title="Yield Curve Chart"    desc="Interactive 2Y/5Y/10Y/30Y curve" layer="Layer 5" />
         <ComingSoon icon={Globe}      title="DXY Correlation"      desc="Dollar vs SPY/BTC rolling window" layer="Layer 5" />
-        <ComingSoon icon={BarChart3}  title="Credit Spreads"       desc="IG & HY spreads from FRED" layer="Layer 5" />
+        <ComingSoon icon={BarChart3}  title="Credit Spreads"       desc="IG &amp; HY spreads from FRED" layer="Layer 5" />
         <ComingSoon icon={DollarSign} title="Central Bank Rates"   desc="Fed, ECB, BOE, BOJ rate table" layer="Layer 5" />
         <ComingSoon icon={TrendingUp} title="Inflation Trends"     desc="CPI vs Core PCE breakdown" layer="Layer 5" />
         <ComingSoon icon={Globe}      title="Real Yields"          desc="TIPS / real yield vs nominal" layer="Layer 5" />

@@ -30,5 +30,6 @@ export function useFxOverview() {
     },
     refetchInterval: 60 * 1000,
     staleTime: 30 * 1000,
+    refetchIntervalInBackground: false,
   })
 }

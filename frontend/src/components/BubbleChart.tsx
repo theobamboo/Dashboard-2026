@@ -9,8 +9,9 @@
  *  - Timeframe tabs: 1H | 24H | 7D
  *  - Force simulation (collision + centering) — runs synchronously then freezes
  *  - Smooth colour transitions on timeframe switch
- *  - Rich hover tooltip
+ *  - Rich hover tooltip (RAF-throttled mousemove)
  *  - Responsive SVG (viewBox-based)
+ *  - Full D3 lifecycle cleanup on unmount (transitions, simulation, SVG nodes)
  */
 
 import { useRef, useEffect, useState, useCallback } from 'react'
@@ -46,7 +47,6 @@ const colorScaleLoss = d3.scaleLinear<string>().domain([-15, 0]).range(['#ff3366
 /** Returns a hex colour for a given % change (-∞…+∞). */
 function pctToColor(pct: number): string {
   if (Math.abs(pct) < 0.05) return '#1a2535'
-  // Use a minimum threshold so even tiny changes show a visible hue
   if (pct > 0) return colorScaleGain(Math.max(pct, 0.3))
   return colorScaleLoss(Math.min(pct, -0.3))
 }
@@ -69,6 +69,33 @@ function fmtMcap(m: number): string {
   if (m >= 1e12) return `$${(m / 1e12).toFixed(2)}T`
   if (m >= 1e9)  return `$${(m / 1e9).toFixed(1)}B`
   return `$${(m / 1e6).toFixed(0)}M`
+}
+
+/**
+ * Safe fallback when coinMap.get(d.id) is undefined (coin left top-N set on
+ * a data refresh). Returns a zero-change placeholder so getPct never crashes.
+ */
+function fallbackCoin(id: string): CoinPrice {
+  return {
+    id,
+    symbol: id,
+    name: id,
+    image: '',
+    current_price: 0,
+    market_cap: 0,
+    market_cap_rank: 0,
+    total_volume: 0,
+    high_24h: null,
+    low_24h: null,
+    price_change_24h: null,
+    price_change_percentage_1h: null,
+    price_change_percentage_24h: null,
+    price_change_percentage_7d: null,
+    circulating_supply: null,
+    ath: null,
+    ath_change_percentage: null,
+    last_updated: null,
+  }
 }
 
 // ── Node type ────────────────────────────────────────────────────────────────
@@ -100,6 +127,8 @@ export default function BubbleChart() {
   const nodesRef  = useRef<BubbleNode[]>([])  // stable node array (simulation mutates x/y)
   const simRef    = useRef<d3.Simulation<BubbleNode, undefined> | null>(null)
   const tfRef     = useRef<Timeframe>('24h')
+  // Pending RAF handle for tooltip throttling
+  const rafRef    = useRef<number | null>(null)
 
   const [tf, setTfState]         = useState<Timeframe>('24h')
   const [ready, setReady]        = useState(false)
@@ -107,11 +136,32 @@ export default function BubbleChart() {
 
   const { data, isLoading, isError } = usePrices(100)
 
+  // ── Full D3 cleanup on unmount ─────────────────────────────────────────────
+  useEffect(() => {
+    return () => {
+      // Cancel any pending RAF tooltip update
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
+      // Stop simulation so it doesn't keep ticking after unmount
+      if (simRef.current) {
+        simRef.current.stop()
+        simRef.current = null
+      }
+      // Interrupt all active D3 transitions and remove SVG content
+      if (svgRef.current) {
+        d3.select(svgRef.current).interrupt().selectAll('*').interrupt().remove()
+      }
+      // Reset stable refs so a remount rebuilds from scratch
+      nodesRef.current = []
+    }
+  }, []) // runs only on unmount
+
   // ── Radius scale (built once, stable) ──────────────────────────────────────
   const rScale = useCallback((coins: CoinPrice[]) => {
     const mcaps = coins.map(c => c.market_cap).filter(Boolean)
     const [minM, maxM] = d3.extent(mcaps) as [number, number]
-    // log-compress the range so BTC doesn't eat everything
     return d3.scaleSqrt()
       .domain([Math.sqrt(minM), Math.sqrt(maxM)])
       .range([22, 88])
@@ -203,6 +253,9 @@ export default function BubbleChart() {
     // Coin lookup map for fast pct access
     const coinMap = new Map(coins.map(c => [c.id, c]))
 
+    // Safe coin accessor — never crashes if a node's id left the top-N set
+    const safeCoin = (id: string): CoinPrice => coinMap.get(id) ?? fallbackCoin(id)
+
     // Bubble groups
     const groups = svg.selectAll<SVGGElement, BubbleNode>('g.bubble')
       .data(nodes, d => d.id)
@@ -215,8 +268,8 @@ export default function BubbleChart() {
     groups.append('circle')
       .attr('class', 'base')
       .attr('r', d => d.r)
-      .attr('fill',   d => pctToColor(getPct(coinMap.get(d.id)!, currentTf)))
-      .attr('stroke', d => pctToStroke(getPct(coinMap.get(d.id)!, currentTf)))
+      .attr('fill',   d => pctToColor(getPct(safeCoin(d.id), currentTf)))
+      .attr('stroke', d => pctToStroke(getPct(safeCoin(d.id), currentTf)))
       .attr('stroke-width', d => d.r > 35 ? 1.5 : 0.8)
       .attr('stroke-opacity', 0.6)
       .style('transition', 'fill 0.5s ease, stroke 0.5s ease')
@@ -264,17 +317,18 @@ export default function BubbleChart() {
       .attr('stroke', 'rgba(0,0,0,0.4)')
       .attr('stroke-width', 2)
       .text(d => {
-        const pct = getPct(coinMap.get(d.id)!, currentTf)
+        const pct = getPct(safeCoin(d.id), currentTf)
         return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`
       })
 
-    // Hover interactions (use raw SVG events for performance)
+    // ── Hover interactions ─────────────────────────────────────────────────
+    // mousemove is RAF-throttled to prevent flooding React with renders
     groups
       .on('mouseenter', function(event: MouseEvent, d: BubbleNode) {
         d3.select(this).select('.base')
           .attr('stroke-opacity', 1)
           .attr('stroke-width', 2.5)
-        const coin = coinMap.get(d.id)!
+        const coin = safeCoin(d.id)
         const pct  = getPct(coin, tfRef.current)
         const rect = (svgRef.current as SVGSVGElement).getBoundingClientRect()
         setTooltip({
@@ -286,10 +340,21 @@ export default function BubbleChart() {
         })
       })
       .on('mousemove', function(event: MouseEvent) {
-        const rect = (svgRef.current as SVGSVGElement).getBoundingClientRect()
-        setTooltip(prev => ({ ...prev, x: event.clientX - rect.left, y: event.clientY - rect.top }))
+        // Throttle position updates to one per animation frame
+        if (rafRef.current !== null) return
+        rafRef.current = requestAnimationFrame(() => {
+          rafRef.current = null
+          if (!svgRef.current) return
+          const rect = (svgRef.current as SVGSVGElement).getBoundingClientRect()
+          setTooltip(prev => ({ ...prev, x: event.clientX - rect.left, y: event.clientY - rect.top }))
+        })
       })
       .on('mouseleave', function() {
+        // Cancel any queued RAF so it doesn't fire after leave
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current)
+          rafRef.current = null
+        }
         d3.select(this).select('.base')
           .attr('stroke-opacity', 0.6)
           .attr('stroke-width', (d: BubbleNode) => d.r > 35 ? 1.5 : 0.8)
@@ -303,17 +368,17 @@ export default function BubbleChart() {
     currentTf: Timeframe,
   ) {
     const coinMap = new Map(coins.map(c => [c.id, c]))
+    const safeCoin = (id: string): CoinPrice => coinMap.get(id) ?? fallbackCoin(id)
 
     svg.selectAll<SVGCircleElement, BubbleNode>('g.bubble circle.base')
+      .interrupt() // cancel any in-flight transition before starting a new one
       .transition().duration(450).ease(d3.easeQuadInOut)
-      .attr('fill',   d => pctToColor(getPct(coinMap.get(d.id)!, currentTf)))
-      .attr('stroke', d => pctToStroke(getPct(coinMap.get(d.id)!, currentTf)))
+      .attr('fill',   d => pctToColor(getPct(safeCoin(d.id), currentTf)))
+      .attr('stroke', d => pctToStroke(getPct(safeCoin(d.id), currentTf)))
 
     svg.selectAll<SVGTextElement, BubbleNode>('g.bubble text.pct')
       .text(d => {
-        const coin = coinMap.get(d.id)
-        if (!coin) return ''
-        const pct = getPct(coin, currentTf)
+        const pct = getPct(safeCoin(d.id), currentTf)
         return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`
       })
   }

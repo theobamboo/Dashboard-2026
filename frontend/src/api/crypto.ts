@@ -76,13 +76,13 @@ export const fetchFearGreed       = (days = 7)  => client.get<FearGreedResponse>
 // ── React Query hooks ────────────────────────────────────────────────────
 
 export const useCryptoOverview = () =>
-  useQuery({ queryKey: ['crypto', 'overview'], queryFn: fetchCryptoOverview, refetchInterval: 60_000 })
+  useQuery({ queryKey: ['crypto', 'overview'], queryFn: fetchCryptoOverview, refetchInterval: 60_000, refetchIntervalInBackground: false })
 
 export const usePrices = (top = 100) =>
-  useQuery({ queryKey: ['crypto', 'prices', top], queryFn: () => fetchPrices(top), refetchInterval: 60_000 })
+  useQuery({ queryKey: ['crypto', 'prices', top], queryFn: () => fetchPrices(top), refetchInterval: 60_000, refetchIntervalInBackground: false })
 
 export const useDominance = () =>
-  useQuery({ queryKey: ['crypto', 'dominance'], queryFn: fetchDominance, refetchInterval: 300_000 })
+  useQuery({ queryKey: ['crypto', 'dominance'], queryFn: fetchDominance, refetchInterval: 300_000, refetchIntervalInBackground: false })
 
 export const useFearGreed = (days = 7) =>
-  useQuery({ queryKey: ['crypto', 'fear-greed', days], queryFn: () => fetchFearGreed(days), refetchInterval: 300_000 })
+  useQuery({ queryKey: ['crypto', 'fear-greed', days], queryFn: () => fetchFearGreed(days), refetchInterval: 300_000, refetchIntervalInBackground: false })

@@ -25,5 +25,6 @@ export function useStocksOverview() {
     // Refetch every 60 seconds since we cache on backend for 60s
     refetchInterval: 60 * 1000,
     staleTime: 30 * 1000,
+    refetchIntervalInBackground: false,
   })
 }

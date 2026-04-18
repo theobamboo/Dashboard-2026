@@ -31,5 +31,6 @@ export function useBondsOverview() {
     // Refetch every 5 minutes
     refetchInterval: 5 * 60 * 1000,
     staleTime: 60 * 1000,
+    refetchIntervalInBackground: false,
   })
 }

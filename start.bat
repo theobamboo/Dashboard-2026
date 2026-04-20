@@ -10,13 +10,13 @@ set "ROOT=%~dp0"
 if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
 
 echo  [1/3] Starting FastAPI backend on port 8000...
-powershell -Command "Start-Process powershell -ArgumentList '-NoExit','-Command','cd \"%ROOT%\"; if (Test-Path \".venv\Scripts\Activate.ps1\") { & \".venv\Scripts\Activate.ps1\" }; python -m uvicorn backend.main:app --reload --port 8000'"
+start "LTD Backend (port 8000)" cmd /k "cd /d "%ROOT%" && (if exist ".venv\Scripts\activate.bat" call ".venv\Scripts\activate.bat") && python -m uvicorn backend.main:app --reload --port 8000"
 
 echo  [2/3] Starting React frontend on port 5173...
-powershell -Command "Start-Process powershell -ArgumentList '-NoExit','-Command','cd \"%ROOT%\frontend\"; npm run dev'"
+start "LTD Frontend (port 5173)" cmd /k "cd /d "%ROOT%\frontend" && npm run dev"
 
-echo  [3/3] Opening browser in 6 seconds...
-timeout /t 6 /nobreak >nul
+echo  [3/3] Opening browser in 7 seconds...
+timeout /t 7 /nobreak >nul
 start "" "http://localhost:5173"
 
 echo.

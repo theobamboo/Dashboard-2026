@@ -150,19 +150,31 @@ class FXEngine:
                 try:
                     ticker = tickers.tickers.get(yf_sym)
                     if not ticker:
+                        res[pair] = {"price": 0.0, "change_pct": 0.0}
                         continue
+
                     fast_info = getattr(ticker, "fast_info", None)
-                    info = getattr(ticker, "info", None) or {}
+
+                    # ticker.info makes an HTTP call in yfinance v0.2+ and can
+                    # raise HTTPError on rate-limits or invalid symbols — guard it.
+                    try:
+                        info: dict = ticker.info or {}
+                    except Exception:
+                        info = {}
+
+                    # fast_info may itself be None — use getattr with a None default
+                    fi_price = getattr(fast_info, "last_price", None)
+                    fi_prev  = getattr(fast_info, "previous_close", None)
 
                     price = float(
-                        getattr(fast_info, "last_price", None)
-                        or info.get("regularMarketPrice")
-                        or 0.0
+                        fi_price
+                        if fi_price is not None
+                        else (info.get("regularMarketPrice") or 0.0)
                     )
                     prev_close = float(
-                        getattr(fast_info, "previous_close", None)
-                        or info.get("previousClose")
-                        or 0.0
+                        fi_prev
+                        if fi_prev is not None
+                        else (info.get("previousClose") or 0.0)
                     )
                     change_pct = (
                         (price - prev_close) / prev_close * 100.0
@@ -181,17 +193,25 @@ class FXEngine:
         try:
             ticker = yf.Ticker("DX-Y.NYB")
             fast_info = getattr(ticker, "fast_info", None)
-            info = getattr(ticker, "info", None) or {}
+
+            # ticker.info raises in yfinance v0.2+ on rate-limits — guard it.
+            try:
+                info: dict = ticker.info or {}
+            except Exception:
+                info = {}
+
+            fi_price = getattr(fast_info, "last_price", None)
+            fi_prev  = getattr(fast_info, "previous_close", None)
 
             price = float(
-                getattr(fast_info, "last_price", None)
-                or info.get("regularMarketPrice")
-                or 0.0
+                fi_price
+                if fi_price is not None
+                else (info.get("regularMarketPrice") or 0.0)
             )
             prev_close = float(
-                getattr(fast_info, "previous_close", None)
-                or info.get("previousClose")
-                or 0.0
+                fi_prev
+                if fi_prev is not None
+                else (info.get("previousClose") or 0.0)
             )
             change_pct = (
                 (price - prev_close) / prev_close * 100.0

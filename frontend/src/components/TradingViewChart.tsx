@@ -41,8 +41,15 @@ const TradingViewChart = memo(function TradingViewChart({
     // ── Build the widget structure TradingView expects ─────────────────────
     //   <div class="tradingview-widget-container">        ← our ref
     //     <div class="tradingview-widget-container__widget" id="tv-{uid}">
-    //     <script type="text/javascript">{ config JSON }</script>
+    //     <script type="text/javascript" src="...">{ config JSON }</script>
     //   </div>
+    //
+    // IMPORTANT: When a <script> element is created via createElement() and
+    // both .src and .textContent are set, browsers silently drop the text
+    // node for external scripts — so TradingView never receives the config.
+    // The fix is to inject the full markup (including the inline JSON) via
+    // innerHTML on a staging div. The browser parses it as static HTML and
+    // preserves the text node exactly as TradingView expects.
 
     const widgetDiv = document.createElement('div')
     widgetDiv.className = 'tradingview-widget-container__widget'
@@ -71,15 +78,12 @@ const TradingViewChart = memo(function TradingViewChart({
       support_host: 'https://www.tradingview.com',
     }
 
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
-    script.async = true
-    // textContent is the correct way to pass inline config to a dynamically
-    // created external script — innerHTML can be blocked by CSP / sanitisers.
-    script.textContent = JSON.stringify(config)
-
-    container.appendChild(script)
+    // Use a staging div + innerHTML so the browser preserves the inline text
+    // node alongside the src attribute (critical for TradingView config delivery).
+    const staging = document.createElement('div')
+    staging.innerHTML = `<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>${JSON.stringify(config)}<\/script>`
+    const scriptNode = staging.firstChild as HTMLScriptElement
+    container.appendChild(scriptNode)
 
     return () => {
       container.innerHTML = ''

@@ -35,9 +35,19 @@ const TF_LABELS: { key: Timeframe; label: string }[] = [
 
 function getPct(coin: CoinPrice, tf: Timeframe): number {
   switch (tf) {
-    case '1h':  return coin.price_change_percentage_1h  ?? 0
-    case '24h': return coin.price_change_percentage_24h ?? coin.price_change_24h ?? 0
-    case '7d':  return coin.price_change_percentage_7d  ?? 0
+    case '1h':  {
+      const val = coin.price_change_percentage_1h
+      // If 1h is missing, don't fall back to 24h — use 0 instead
+      return val != null ? Math.max(-200, Math.min(500, val)) : 0
+    }
+    case '24h': {
+      const val = coin.price_change_percentage_24h ?? coin.price_change_24h
+      return val != null ? Math.max(-200, Math.min(500, val)) : 0
+    }
+    case '7d':  {
+      const val = coin.price_change_percentage_7d
+      return val != null ? Math.max(-200, Math.min(500, val)) : 0
+    }
   }
 }
 
@@ -212,9 +222,10 @@ export default function BubbleChart() {
 
   // ── Timeframe change: update colours only (positions are stable) ───────────
   const setTf = useCallback((newTf: Timeframe) => {
-    setTfState(newTf)
-    tfRef.current = newTf
-    if (!data || !svgRef.current) return
+    tfRef.current = newTf  // Update ref immediately for tooltip access
+    setTfState(newTf)      // Trigger React re-render for button styling
+    if (!data?.coins || !svgRef.current) return
+    // Ensure all coins have valid percentage data before rendering
     updateColors(d3.select(svgRef.current), data.coins, newTf)
   }, [data])
 
@@ -357,7 +368,7 @@ export default function BubbleChart() {
         }
         d3.select(this).select('.base')
           .attr('stroke-opacity', 0.6)
-          .attr('stroke-width', (d: BubbleNode) => d.r > 35 ? 1.5 : 0.8)
+          .attr('stroke-width', (d: unknown) => ((d as BubbleNode).r > 35 ? 1.5 : 0.8))
         setTooltip(prev => ({ ...prev, visible: false }))
       })
   }

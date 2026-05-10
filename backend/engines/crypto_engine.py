@@ -106,7 +106,7 @@ class CryptoEngine:
                 "per_page": min(top_n, 250),
                 "page": 1,
                 "sparkline": "false",
-                "price_change_percentage": "1h,24h,7d",
+                "price_change_percentage": "1h,24h,7d",  # Request all three timeframes explicitly
             },
         )
 

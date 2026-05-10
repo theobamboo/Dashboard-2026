@@ -7,16 +7,16 @@ interface StatCardProps {
   label: string
   value: string | number
   subValue?: string
-  change?: number       // percentage — drives variant if set
+  change?: number | null       // percentage — drives variant if set
   variant?: Variant
   icon?: ReactNode
   suffix?: string
   loading?: boolean
 }
 
-function getVariant(change?: number, variant?: Variant): Variant {
+function getVariant(change?: number | null, variant?: Variant): Variant {
   if (variant && variant !== 'default') return variant
-  if (change === undefined) return 'default'
+  if (change == null) return 'default'
   if (change > 0) return 'gain'
   if (change < 0) return 'loss'
   return 'neutral'
@@ -67,7 +67,7 @@ export default function StatCard({
 
       {/* Bottom row — sub value or change badge */}
       <div className="flex items-center gap-2 mt-1.5">
-        {change !== undefined && (
+        {change != null && (
           <span className={`inline-flex items-center gap-0.5 text-xs font-mono font-medium ${CHANGE_STYLES[v]}`}>
             {change > 0 ? <TrendingUp size={10} /> : change < 0 ? <TrendingDown size={10} /> : <Minus size={10} />}
             {change > 0 ? '+' : ''}{change.toFixed(2)}%

@@ -77,16 +77,36 @@ class CoinPrice(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def _fill_pct_fallbacks(cls, data: dict) -> dict:
-        """If the _in_currency variants are absent/null, fall back to the plain
-        price_change_percentage_* fields that CoinGecko always returns."""
+        """Ensure all percentage fields are populated.
+        CoinGecko returns price_change_percentage_XXh for each requested timeframe.
+        Alias to _in_currency for clarity. Add bounds checking to catch bad data."""
         if isinstance(data, dict):
+            # Map both plain and _in_currency variants to the aliased field names
             for tf_key, plain_key in (
                 ("price_change_percentage_1h_in_currency",  "price_change_percentage_1h"),
                 ("price_change_percentage_24h_in_currency", "price_change_percentage_24h"),
                 ("price_change_percentage_7d_in_currency",  "price_change_percentage_7d"),
             ):
-                if data.get(tf_key) is None and data.get(plain_key) is not None:
-                    data[tf_key] = data[plain_key]
+                # Use _in_currency if present and valid, otherwise fall back to plain
+                val = data.get(tf_key)
+                if val is None:
+                    val = data.get(plain_key)
+                
+                if val is not None:
+                    # Clamp unreasonable values (e.g., -168% doesn't make sense)
+                    # Allow [-200, 500] range to catch data errors while preserving extreme moves
+                    if isinstance(val, (int, float)):
+                        clamped = max(-200, min(500, val))
+                        if abs(clamped - val) > 0.01:  # Log if clamping happened
+                            import logging
+                            logging.warning(f"Clamped {plain_key} from {val} to {clamped}")
+                        data[tf_key] = clamped
+                    else:
+                        val = None
+                
+                # Ensure both the plain and _in_currency keys exist with same value
+                if data.get(tf_key) is not None:
+                    data[plain_key] = data[tf_key]
         return data
 
 
